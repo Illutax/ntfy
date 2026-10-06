@@ -1,12 +1,26 @@
 # ~/docker/ntfy/compose.yaml
 services:
   ntfy:
-    image: binwiederhier/ntfy:v2.11.0   # aktuelles Release auf Docker Hub prüfen
+    image: binwiederhier/ntfy:v2.11.0
     container_name: ntfy
     command: serve
-    user: "1000:1000"                   # = ubu, damit ./cache und ./etc beschreibbar sind
+    user: "1000:1000"
+    environment:
+      NTFY_BASE_URL: ${NTFY_BASE_URL:-?NO BASEURL SET}
+      NTFY_LISTEN_HTTP: ":80"
+      NTFY_BEHIND_PROXY: "true"
+      NTFY_CACHE_FILE: /var/cache/ntfy/cache.db
+      NTFY_CACHE_DURATION: 72h
+      NTFY_ATTACHMENT_CACHE_DIR: /var/cache/ntfy/attachments
+      NTFY_ATTACHMENT_TOTAL_SIZE_LIMIT: 1G
+      NTFY_ATTACHMENT_FILE_SIZE_LIMIT: 15M
+      NTFY_ATTACHMENT_EXPIRY_DURATION: 24h
+      NTFY_AUTH_FILE: /var/cache/ntfy/user.db
+      NTFY_AUTH_DEFAULT_ACCESS: deny-all
+      NTFY_ENABLE_LOGIN: "true"
+      NTFY_ENABLE_SIGNUP: "false"
+      NTFY_WEB_ROOT: /
     volumes:
-      - ./etc:/etc/ntfy
       - ./cache:/var/cache/ntfy
     networks:
       - webserver
@@ -19,4 +33,4 @@ services:
 
 networks:
   webserver:
-    external: true                      # wird vom webserver-Stack angelegt
+    external: true
